@@ -127,7 +127,7 @@ void applyCurve(inout vec3 pos, vec3 nor) {
 void applyWind(inout vec3 pos, vec2 worldPosition) {
     // Sample perlin noise based on world position + time moving left to right
     float windSpeed = 0.9; // How fast the wind pattern moves
-    float windScale = 0.3; // Size of wind waves (smaller = larger waves)
+    float windScale = 0.2; // Size of wind waves (smaller = larger waves)
 
     vec2 noiseInput = vec2(
       worldPosition.x * windScale + uTime * windSpeed,
@@ -136,18 +136,14 @@ void applyWind(inout vec3 pos, vec2 worldPosition) {
 
     float noiseValue = cnoise(noiseInput); // Returns -1 to 1
 
-    // Convert noise from -1..1 to 0..1 (so it only controls intensity)
     float windIntensity = (noiseValue + 1.0) * 0.5; // Now 0 to 1
 
-    // Normalize Y position (assuming blade height is 3 units)
     float heightFactor = (pos.y + 1.0) / 2.0; // 0 at base, 1 at tip
     heightFactor = pow(heightFactor, 2.0); // Square it so tip bends much more
 
-    // Fixed wind direction (you can change this to control direction)
     vec2 windDirection = vec2(1.0, 0.2); // Mostly X direction, slight Z
     windDirection = normalize(windDirection);
 
-    // Apply bending in the fixed direction, scaled by noise intensity
     float bendStrength = windIntensity * 10.8 * heightFactor; // 0.8 is max bend
 
     pos.x -= windDirection.x * bendStrength;
@@ -182,10 +178,13 @@ void main() {
   applyDeformation(pos, nor, randomSeed);
 
   vec4 modelPosition = modelMatrix * instanceMatrix * vec4(pos, 1.0);
-
   positionY = modelPosition.y;
 
   vec4 viewPosition = viewMatrix * modelPosition;
   vec4 projectedPosition = projectionMatrix * viewPosition;
-  gl_Position = projectedPosition;
+
+//  gl_Position=projectedPosition;
+
+  csm_Position = pos;
+  csm_Normal=nor;
 }

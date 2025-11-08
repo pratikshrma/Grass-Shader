@@ -3,6 +3,8 @@ import * as THREE from "three";
 import vertexShader from "../shaders/grass/vert.glsl?raw";
 import fragmentShader from "../shaders/grass/frag.glsl?raw";
 import { useFrame } from "@react-three/fiber";
+import { folder, useControls } from "leva";
+import CustomShaderMaterial from "three-custom-shader-material/vanilla";
 
 interface props {
   platform_width: number;
@@ -10,29 +12,62 @@ interface props {
 }
 
 const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
+  const { BLADE_COUNT, bladeBaseColor, bladeTipColor } = useControls({
+    BladeSetting: folder({
+      BLADE_COUNT: {
+        value: 100000,
+        min: 10000,
+        max: 1000000,
+        step: 100,
+        label: "bladeCount",
+      },
+      bladeBaseColor: {
+        value: "#096c13",
+      },
+      bladeTipColor: {
+        value: "#baba28",
+      },
+    }),
+  });
+
   const [grassGeometry, grassMaterial] = useMemo(() => {
-    const mat: THREE.ShaderMaterial = new THREE.ShaderMaterial({
+    // const mat: THREE.ShaderMaterial = new THREE.ShaderMaterial({
+    //   fragmentShader: fragmentShader,
+    //   vertexShader: vertexShader,
+    //   side: THREE.DoubleSide,
+    //   uniforms: {
+    //     uTime: { value: 0.0 },
+    //     uBladeTipColor:{value: new THREE.Color(bladeTipColor)},
+    //     uBladeBaseColor:{value: new THREE.Color(bladeBaseColor)},
+    //   },
+    //   shadowSide: THREE.FrontSide,
+    // });
+
+    const mat: CustomShaderMaterial = new CustomShaderMaterial({
+      baseMaterial: THREE.MeshPhysicalMaterial,
       fragmentShader: fragmentShader,
       vertexShader: vertexShader,
       side: THREE.DoubleSide,
       uniforms: {
         uTime: { value: 0.0 },
+        uBladeTipColor: { value: new THREE.Color(bladeTipColor) },
+        uBladeBaseColor: { value: new THREE.Color(bladeBaseColor) },
       },
       shadowSide: THREE.FrontSide,
+      transmission: 0.6,
+      thickness: 0.1,
+      roughness: 0.7,
+      metalness: 0.1,
     });
 
-    const geo: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3, 6, 10);
+    const geo: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3, 6, 15);
     console.log("Attributes ", geo.attributes);
     return [geo, mat];
-  }, []);
+  }, [bladeBaseColor, bladeTipColor]);
 
   useFrame((state) => {
     grassMaterial.uniforms.uTime.value = state.clock.elapsedTime;
   });
-
-  //lets just first generate a lot of grassCoords
-
-  const BLADE_COUNT = 100000;
 
   const meshRef = useRef<THREE.InstancedMesh | null>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
@@ -72,7 +107,13 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
     });
 
     meshRef.current.instanceMatrix.needsUpdate = true;
-  }, []);
+  }, [
+    platform_depth,
+    platform_width,
+    BLADE_COUNT,
+    dummy,
+    grassMaterial.uniforms,
+  ]);
 
   return (
     <>

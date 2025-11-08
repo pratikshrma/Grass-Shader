@@ -3,17 +3,35 @@ import * as THREE from "three";
 import vertexShader from "../shaders/portal/vert.glsl?raw";
 import fragmentShader from "../shaders/portal/frag.glsl?raw";
 import { useFrame } from "@react-three/fiber";
-import { useControls } from "leva";
+import { folder, useControls } from "leva";
 import { useEffect, useMemo } from "react";
 import Grass from "./Grass";
 import Lights from "./Lights";
 
 const Experience = () => {
-  const { colorStart, colorEnd } = useControls({
-    colorStart: "#ff0000",
-    colorEnd: "#0000ff"
+  const { portalInnerColor, portalOuterColor } = useControls({
+    PortalSetting: folder({
+      portalInnerColor: "#ff0000",
+      portalOuterColor: "#0000ff",
+    }),
   });
 
+  const { platformWidth, platformDepth } = useControls({
+    PlatformSetting: folder({
+      platformWidth: {
+        value: 100,
+        min: 10,
+        max: 300,
+        step: 1,
+      },
+      platformDepth: {
+        value: 100,
+        min: 10,
+        max: 300,
+        step: 1,
+      },
+    }),
+  });
   const portalShaderMaterial = useMemo(() => {
     return new THREE.ShaderMaterial({
       side: THREE.DoubleSide,
@@ -21,19 +39,19 @@ const Experience = () => {
       vertexShader: vertexShader,
       uniforms: {
         uTime: { value: 0.0 },
-        uColorStart: { value: new THREE.Color(colorStart) },
-        uColorEnd: { value: new THREE.Color(colorEnd) },
+        uColorStart: { value: new THREE.Color(portalInnerColor) },
+        uColorEnd: { value: new THREE.Color(portalOuterColor) },
       },
     });
-  }, []);
+  }, [portalInnerColor, portalOuterColor]);
 
   useEffect(() => {
-    portalShaderMaterial.uniforms.uColorStart.value.set(colorStart);
-  }, [colorStart, portalShaderMaterial]);
+    portalShaderMaterial.uniforms.uColorStart.value.set(portalInnerColor);
+  }, [portalInnerColor, portalShaderMaterial]);
 
   useEffect(() => {
-    portalShaderMaterial.uniforms.uColorEnd.value.set(colorEnd);
-  }, [colorEnd, portalShaderMaterial]);
+    portalShaderMaterial.uniforms.uColorEnd.value.set(portalOuterColor);
+  }, [portalOuterColor, portalShaderMaterial]);
 
   useFrame((state) => {
     portalShaderMaterial.uniforms.uTime.value = state.clock.elapsedTime;
@@ -44,13 +62,13 @@ const Experience = () => {
       <Lights />
       <Portal />
       <mesh receiveShadow rotation-x={Math.PI / 2} position-y={-0.5}>
-        <boxGeometry args={[30, 30]} />
-        <meshStandardMaterial />
+        <boxGeometry args={[platformWidth / 2 + 3, platformDepth / 2 + 3]} />
+        <meshStandardMaterial color={"#073e06"} />
       </mesh>
       <mesh position={[-0.2, 2, 0]} material={portalShaderMaterial}>
         <circleGeometry args={[2.2]} />
       </mesh>
-      <Grass platform_width={100} platform_depth={100}/>
+      <Grass platform_width={platformWidth} platform_depth={platformDepth} />
     </group>
   );
 };
