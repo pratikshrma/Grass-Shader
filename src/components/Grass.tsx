@@ -16,7 +16,7 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
   const { BLADE_COUNT, bladeBaseColor, bladeTipColor } = useControls({
     BladeSetting: folder({
       BLADE_COUNT: {
-        value: 100000,
+        value: 100010,
         min: 10000,
         max: 1000000,
         step: 100,
@@ -32,18 +32,6 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
   });
 
   const [grassGeometry, grassMaterial] = useMemo(() => {
-    // const mat: THREE.ShaderMaterial = new THREE.ShaderMaterial({
-    //   fragmentShader: fragmentShader,
-    //   vertexShader: vertexShader,
-    //   side: THREE.DoubleSide,
-    //   uniforms: {
-    //     uTime: { value: 0.0 },
-    //     uBladeTipColor:{value: new THREE.Color(bladeTipColor)},
-    //     uBladeBaseColor:{value: new THREE.Color(bladeBaseColor)},
-    //   },
-    //   shadowSide: THREE.FrontSide,
-    // });
-
     const mat: CustomShaderMaterial = new CustomShaderMaterial({
       baseMaterial: THREE.MeshPhysicalMaterial,
       fragmentShader: fragmentShader,
@@ -51,8 +39,8 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
       side: THREE.DoubleSide,
       uniforms: {
         uTime: { value: 0.0 },
-        uBladeTipColor: { value: new THREE.Color(bladeTipColor) },
-        uBladeBaseColor: { value: new THREE.Color(bladeBaseColor) },
+        uBladeTipColor: { value: new THREE.Color("#096c13") },
+        uBladeBaseColor: { value: new THREE.Color("#baba28") },
       },
       shadowSide: THREE.FrontSide,
       transmission: 0.6,
@@ -61,9 +49,15 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
       metalness: 0.1,
     });
 
-    const geo: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3, 6, 15);
+    const geo: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3, 6, 10);
     return [geo, mat];
-  }, [bladeBaseColor, bladeTipColor]);
+  }, []);
+
+  // Update material uniforms when colors change
+  useEffect(() => {
+    grassMaterial.uniforms.uBladeTipColor.value=new THREE.Color(bladeTipColor);
+    grassMaterial.uniforms.uBladeBaseColor.value=new THREE.Color(bladeBaseColor);
+  }, [bladeBaseColor, bladeTipColor, grassMaterial]);
 
   useFrame((state) => {
     grassMaterial.uniforms.uTime.value = state.clock.elapsedTime;
@@ -72,8 +66,7 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
   const meshRef = useRef<THREE.InstancedMesh | null>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   useEffect(() => {
-    if (!meshRef.current) return;
-
+    if (meshRef.current==null) return;
     for (let i = 0; i < BLADE_COUNT; i++) {
       dummy.position.set(
         THREE.MathUtils.randFloatSpread(platform_width / 2),
@@ -84,28 +77,6 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
       meshRef.current.setMatrixAt(i, dummy.matrix);
     }
     meshRef.current.castShadow = true;
-    meshRef.current.instanceMatrix.needsUpdate = true;
-
-    meshRef.current.customDepthMaterial = new THREE.ShaderMaterial({
-      vertexShader: vertexShader,
-      fragmentShader: `
-      #include <common>
-      #include <packing>
-      #include <logdepthbuf_pars_fragment>
-      #include <clipping_planes_pars_fragment>
-      
-      void main() {
-        #include <clipping_planes_fragment>
-        #include <logdepthbuf_fragment>
-        
-        gl_FragColor = packDepthToRGBA(gl_FragCoord.z);
-      }
-    `,
-      uniforms: {
-        uTime: grassMaterial.uniforms.uTime,
-      },
-    });
-
     meshRef.current.instanceMatrix.needsUpdate = true;
   }, [
     platform_depth,
@@ -118,6 +89,7 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
   return (
     <>
       <instancedMesh
+        key={BLADE_COUNT}
         ref={meshRef}
         args={[grassGeometry, grassMaterial, BLADE_COUNT]}
       />

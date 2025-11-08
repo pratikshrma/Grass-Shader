@@ -125,30 +125,30 @@ void applyCurve(inout vec3 pos, vec3 nor) {
 }
 
 void applyWind(inout vec3 pos, vec2 worldPosition) {
-    // Sample perlin noise based on world position + time moving left to right
-    float windSpeed = 0.9; // How fast the wind pattern moves
-    float windScale = 0.2; // Size of wind waves (smaller = larger waves)
+  // Sample perlin noise based on world position + time moving left to right
+  float windSpeed = 0.9; // How fast the wind pattern moves
+  float windScale = 0.2; // Size of wind waves (smaller = larger waves)
 
-    vec2 noiseInput = vec2(
+  vec2 noiseInput = vec2(
       worldPosition.x * windScale + uTime * windSpeed,
       worldPosition.y * windScale
     );
 
-    float noiseValue = cnoise(noiseInput); // Returns -1 to 1
+  float noiseValue = cnoise(noiseInput); // Returns -1 to 1
 
-    float windIntensity = (noiseValue + 1.0) * 0.5; // Now 0 to 1
+  float windIntensity = (noiseValue + 1.0) * 0.5; // Now 0 to 1
 
-    float heightFactor = (pos.y + 1.0) / 2.0; // 0 at base, 1 at tip
-    heightFactor = pow(heightFactor, 2.0); // Square it so tip bends much more
+  float heightFactor = (pos.y + 1.0) / 2.0; // 0 at base, 1 at tip
+  heightFactor = pow(heightFactor, 2.0); // Square it so tip bends much more
 
-    vec2 windDirection = vec2(1.0, 0.2); // Mostly X direction, slight Z
-    windDirection = normalize(windDirection);
+  vec2 windDirection = vec2(1.0, 0.2); // Mostly X direction, slight Z
+  windDirection = normalize(windDirection);
 
-    float bendStrength = windIntensity * 10.8 * heightFactor; // 0.8 is max bend
+  float bendStrength = windIntensity * 10.8 * heightFactor; // 0.8 is max bend
 
-    pos.x -= windDirection.x * bendStrength;
-    pos.z -= windDirection.y * bendStrength;
-  }
+  pos.x -= windDirection.x * bendStrength;
+  pos.z -= windDirection.y * bendStrength;
+}
 void applyDeformation(inout vec3 pos, inout vec3 nor, vec2 randomSeed) {
   vec3 defomedPosition = deform(pos, randomSeed);
 
@@ -180,11 +180,11 @@ void main() {
   vec4 modelPosition = modelMatrix * instanceMatrix * vec4(pos, 1.0);
   positionY = modelPosition.y;
 
-  vec4 viewPosition = viewMatrix * modelPosition;
-  vec4 projectedPosition = projectionMatrix * viewPosition;
+  // vec4 viewPosition = viewMatrix * modelPosition;
+  // vec4 projectedPosition = projectionMatrix * viewPosition;
 
-//  gl_Position=projectedPosition;
+  //  gl_Position=projectedPosition;
 
   csm_Position = pos;
-  csm_Normal=nor;
+  csm_Normal = nor;
 }
