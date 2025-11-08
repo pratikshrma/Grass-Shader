@@ -21,7 +21,7 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
       shadowSide: THREE.FrontSide,
     });
 
-    const geo: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3, 10, 10);
+    const geo: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3, 6, 10);
     console.log("Attributes ", geo.attributes);
     return [geo, mat];
   }, []);
