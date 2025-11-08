@@ -5,6 +5,7 @@ import fragmentShader from "../shaders/grass/frag.glsl?raw";
 import { useFrame } from "@react-three/fiber";
 import { folder, useControls } from "leva";
 import CustomShaderMaterial from "three-custom-shader-material/vanilla";
+import Flowers from "./Flowers";
 
 interface props {
   platform_width: number;
@@ -61,7 +62,6 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
     });
 
     const geo: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3, 6, 15);
-    console.log("Attributes ", geo.attributes);
     return [geo, mat];
   }, [bladeBaseColor, bladeTipColor]);
 
@@ -121,6 +121,7 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
         ref={meshRef}
         args={[grassGeometry, grassMaterial, BLADE_COUNT]}
       />
+      <Flowers/>
     </>
   );
 };
