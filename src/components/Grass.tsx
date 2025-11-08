@@ -26,14 +26,14 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
         value: "#096c13",
       },
       bladeTipColor: {
-        value: "#baba28",
+        value: "#96961e",
       },
     }),
   });
 
   const [grassGeometry, grassMaterial] = useMemo(() => {
     const mat: CustomShaderMaterial = new CustomShaderMaterial({
-      baseMaterial: THREE.MeshPhysicalMaterial,
+      baseMaterial: THREE.MeshStandardMaterial,
       fragmentShader: fragmentShader,
       vertexShader: vertexShader,
       side: THREE.DoubleSide,
@@ -43,13 +43,11 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
         uBladeBaseColor: { value: new THREE.Color("#baba28") },
       },
       shadowSide: THREE.FrontSide,
-      transmission: 0.6,
-      thickness: 0.1,
       roughness: 0.7,
       metalness: 0.1,
     });
 
-    const geo: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3, 6, 10);
+    const geo: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3, 4, 8);
     return [geo, mat];
   }, []);
 

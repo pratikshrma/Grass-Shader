@@ -138,13 +138,13 @@ void applyWind(inout vec3 pos, vec2 worldPosition) {
 
   float windIntensity = (noiseValue + 1.0) * 0.5; // Now 0 to 1
 
-  float heightFactor = (pos.y + 1.0) / 2.0; // 0 at base, 1 at tip
-  heightFactor = pow(heightFactor, 2.0); // Square it so tip bends much more
+  float heightFactor = (pos.y + 1.2) / 2.0; // 0 at base, 1 at tip
+  heightFactor = pow(heightFactor, 2.2); // Square it so tip bends much more
 
   vec2 windDirection = vec2(1.0, 0.2); // Mostly X direction, slight Z
   windDirection = normalize(windDirection);
 
-  float bendStrength = windIntensity * 10.8 * heightFactor; // 0.8 is max bend
+  float bendStrength = windIntensity * 7.8 * heightFactor; // 0.8 is max bend
 
   pos.x -= windDirection.x * bendStrength;
   pos.z -= windDirection.y * bendStrength;
