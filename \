@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef,useState } from "react";
 import * as THREE from "three";
 import vertexShader from "../shaders/grass/vert.glsl?raw";
 import fragmentShader from "../shaders/grass/frag.glsl?raw";
@@ -26,7 +26,7 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
           },
         },
         BLADE_COUNT: {
-          value: 200000,
+          value: 100000,
           min: 10000,
           max: 10000000,
           step: 100,
@@ -41,6 +41,9 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
       }),
     });
 
+  const [highResBladeCount,setHighResBladeCount]= useState(0);
+  const [lowResBladeCount,setLowResBladeCount]= useState(0);
+  
   const [
     grassGeometryHigh,
     grassGeometryLow,
@@ -76,7 +79,7 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
     });
 
     const geoHigh: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3, 4, 8);
-    const geoLow: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3,4 , 2);
+    const geoLow: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3, 4, 2);
     return [geoHigh, geoLow, mat1, mat2];
   }, []);
 
@@ -101,7 +104,7 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
   const meshRefHigh = useRef<THREE.InstancedMesh | null>(null);
 
   const masterGrassMatrix = useMemo(() => {
-    const dummy = new THREE.Object3D();
+  const dummy =  new THREE.Object3D()
     const matrices = [];
     for (let i = 0; i < BLADE_COUNT; i++) {
       dummy.position.set(
@@ -115,44 +118,48 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
     return matrices;
   }, [BLADE_COUNT, platform_width, platform_depth]);
 
-  useFrame((state) => {
-    activeMaterial.uniforms.uTime.value = state.clock.elapsedTime;
-    
+  
+  useEffect(() => {
     if (meshRefHigh.current == null || meshRefLow.current == null) return;
     const bladePosition = new THREE.Vector3();
-    const radius = 15;
-    let hBladeCount = 0;
-    let lBladeCount = 0;
+    const radius = 40;
+    let hBladeCount=0;
+    let lBladeCount=0;
     for (let i = 0; i < BLADE_COUNT; i++) {
       const matrix = masterGrassMatrix[i];
       bladePosition.setFromMatrixPosition(matrix);
       const distance = camera.position.distanceTo(bladePosition);
       if (distance < radius) {
         meshRefHigh.current.setMatrixAt(hBladeCount, matrix);
-        hBladeCount += 1;
+        hBladeCount+=1;
       } else {
         meshRefLow.current.setMatrixAt(lBladeCount, matrix);
-        lBladeCount += 1;
+        lBladeCount+=1; 
       }
+      console.log(lBladeCount)
+      meshRefHigh.current.instanceMatrix.needsUpdate = true;
+      meshRefLow.current.instanceMatrix.needsUpdate = true;
+      setHighResBladeCount(hBladeCount)
+      setLowResBladeCount(lBladeCount)
     }
-    meshRefHigh.current.count=hBladeCount
-    meshRefLow.current.count=lBladeCount
-
-    meshRefHigh.current.instanceMatrix.needsUpdate = true;
-    meshRefLow.current.instanceMatrix.needsUpdate = true;
+  }, [masterGrassMatrix,BLADE_COUNT]);
+  
+  useFrame((state) => {
+    activeMaterial.uniforms.uTime.value = state.clock.elapsedTime;
   });
 
+  console.log(highResBladeCount," ",meshRefHigh)
   return (
     <>
       <instancedMesh
         key={BLADE_COUNT + bladeMaterial + "HIGH"}
         ref={meshRefHigh}
-        args={[grassGeometryHigh, activeMaterial, BLADE_COUNT]}
+        args={[grassGeometryHigh, activeMaterial, highResBladeCount]}
       />
       <instancedMesh
-        key={BLADE_COUNT + bladeMaterial  + "LOW"}
+        key={BLADE_COUNT + bladeMaterial + "LOW"}
         ref={meshRefLow}
-        args={[grassGeometryLow, activeMaterial,BLADE_COUNT ]}
+        args={[grassGeometryLow, activeMaterial, lowResBladeCount]}
       />
     </>
   );

@@ -10,5 +10,6 @@ void main() {
   vec3 baseColor = uBladeBaseColor;
 
   vec3 mixedColor = mix(baseColor, tipColor, positionY * positionY);
-  gl_FragColor = vec4(mixedColor, 1.0);
+  csm_DiffuseColor= vec4(mixedColor, 1.0);
+  //gl_FragColor = vec4(mixedColor, 1.0);
 }

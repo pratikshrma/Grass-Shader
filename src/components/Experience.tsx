@@ -21,13 +21,13 @@ const Experience = () => {
       platformWidth: {
         value: 100,
         min: 10,
-        max: 300,
+        max: 3000,
         step: 1,
       },
       platformDepth: {
         value: 100,
         min: 10,
-        max: 300,
+        max: 3000,
         step: 1,
       },
     }),

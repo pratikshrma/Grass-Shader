@@ -180,9 +180,11 @@ void main() {
   vec4 modelPosition = modelMatrix * instanceMatrix * vec4(pos, 1.0);
   positionY = modelPosition.y;
 
-  vec4 viewPosition = viewMatrix * modelPosition;
-  vec4 projectedPosition = projectionMatrix * viewPosition;
+  // vec4 viewPosition = viewMatrix * modelPosition;
+  // vec4 projectedPosition = projectionMatrix * viewPosition;
 
-   gl_Position=projectedPosition;
+  //  gl_Position=projectedPosition;
 
+  csm_Position = pos;
+  csm_Normal = nor;
 }
