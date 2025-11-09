@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import vertexShader from "../shaders/grass/vert.glsl?raw";
 import fragmentShader from "../shaders/grass/frag.glsl?raw";
@@ -76,7 +76,7 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
     });
 
     const geoHigh: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3, 4, 8);
-    const geoLow: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3,4 , 2);
+    const geoLow: THREE.PlaneGeometry = new THREE.PlaneGeometry(0.2, 3, 4, 2);
     return [geoHigh, geoLow, mat1, mat2];
   }, []);
 
@@ -117,7 +117,7 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
 
   useFrame((state) => {
     activeMaterial.uniforms.uTime.value = state.clock.elapsedTime;
-    
+
     if (meshRefHigh.current == null || meshRefLow.current == null) return;
     const bladePosition = new THREE.Vector3();
     const radius = 15;
@@ -127,6 +127,9 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
       const matrix = masterGrassMatrix[i];
       bladePosition.setFromMatrixPosition(matrix);
       const distance = camera.position.distanceTo(bladePosition);
+      //just check here if it comes in the fov if yes add it other wise
+       
+      
       if (distance < radius) {
         meshRefHigh.current.setMatrixAt(hBladeCount, matrix);
         hBladeCount += 1;
@@ -135,8 +138,8 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
         lBladeCount += 1;
       }
     }
-    meshRefHigh.current.count=hBladeCount
-    meshRefLow.current.count=lBladeCount
+    meshRefHigh.current.count = hBladeCount;
+    meshRefLow.current.count = lBladeCount;
 
     meshRefHigh.current.instanceMatrix.needsUpdate = true;
     meshRefLow.current.instanceMatrix.needsUpdate = true;
@@ -150,9 +153,9 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
         args={[grassGeometryHigh, activeMaterial, BLADE_COUNT]}
       />
       <instancedMesh
-        key={BLADE_COUNT + bladeMaterial  + "LOW"}
+        key={BLADE_COUNT + bladeMaterial + "LOW"}
         ref={meshRefLow}
-        args={[grassGeometryLow, activeMaterial,BLADE_COUNT ]}
+        args={[grassGeometryLow, activeMaterial, BLADE_COUNT]}
       />
     </>
   );
