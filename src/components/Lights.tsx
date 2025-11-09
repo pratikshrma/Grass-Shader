@@ -4,19 +4,22 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 const Lights = () => {
   const { scene } = useThree();
-  const { lightPos, lightColor, lightIntensity } = useControls({
+  const { lightPos, lightColor, lightIntensity, lightHelper } = useControls({
     lightSetting: folder({
       lightPos: {
-        value: [10, 10, 10],
+        value: [-7, 10, 10],
       },
       lightColor: {
-        value: "#ffd700",
+        value: "#36454f",
       },
       lightIntensity: {
-        value: 1,
-        min: 1,
+        value: 3,
+        min: 0,
         max: 10,
-        step: 1,
+        step: 0.01,
+      },
+      lightHelper: {
+        value:false
       },
     }),
   });
@@ -26,12 +29,16 @@ const Lights = () => {
     if (!lightRef.current) return;
 
     const helper = new THREE.DirectionalLightHelper(lightRef.current, 2);
-    scene.add(helper);
-  }, [lightRef, scene]);
+    if (lightHelper) {
+      scene.add(helper);
+    }
+
+    return ()=>{scene.remove(helper)}
+  }, [lightRef, scene,lightHelper]);
 
   return (
     <>
-      <ambientLight intensity={1} color={"white"} />
+      <ambientLight intensity={0} color={"white"} />
       <directionalLight
         ref={lightRef}
         castShadow

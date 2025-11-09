@@ -33,10 +33,10 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
           label: "bladeCount",
         },
         bladeBaseColor: {
-          value: "#096c13",
+          value: "#000000",
         },
         bladeTipColor: {
-          value: "#96961e",
+          value: "#215976",
         },
       }),
     });

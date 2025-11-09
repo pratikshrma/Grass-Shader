@@ -11,6 +11,7 @@ const App = () => {
       gl={{ antialias: true }}
       camera={{ position: [3, 3, 10] }}
     >
+      <color attach="background" args={["#080808"]}/>
       <Perf position="top-left" />
       <OrbitControls />
       <Lights />
