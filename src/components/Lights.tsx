@@ -13,7 +13,7 @@ const Lights = () => {
         value: "#36454f",
       },
       lightIntensity: {
-        value: 3,
+        value: 4,
         min: 0,
         max: 10,
         step: 0.01,

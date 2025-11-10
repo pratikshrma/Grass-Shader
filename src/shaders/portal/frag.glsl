@@ -102,11 +102,12 @@ void main(){
   strength+=outerGlow;
   strength+=step(1.0,strength);
   
-  strength=clamp(strength,0.0,1.0);
-  
-  vec3 color=mix(uColorStart,uColorEnd,strength);
+  strength=clamp(strength,0.0,4.0);
+ vec4 transparentColorStart=vec4(uColorStart.xyz,0.3); 
+  vec4 color=mix(transparentColorStart,vec4(uColorEnd,1.0),strength*3.0);
 
-  gl_FragColor=vec4(color,1.0);
+  // gl_FragColor=vec4(color);
+  csm_FragColor=vec4(color);
 }
 
 

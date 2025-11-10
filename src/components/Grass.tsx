@@ -26,7 +26,7 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
           },
         },
         BLADE_COUNT: {
-          value: 200000,
+          value: 100000,
           min: 10000,
           max: 10000000,
           step: 100,
@@ -36,7 +36,7 @@ const Grass: React.FC<props> = ({ platform_depth, platform_width }) => {
           value: "#000000",
         },
         bladeTipColor: {
-          value: "#215976",
+          value: "#4698c1",
         },
       }),
     });
